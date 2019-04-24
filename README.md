@@ -8,7 +8,7 @@ Currect Prediction Accuracy (OWL 2019 Stage 2):
    - Win/Lose Accuracy - 85% 
    - Match Score Accuracy - 48%
 
-Requirements: 
+Environment: 
 
     Python 2.x
 
