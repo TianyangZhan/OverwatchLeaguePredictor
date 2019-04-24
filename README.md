@@ -1,8 +1,8 @@
-# OverwatchLeagueScorePrediction
+# Overwatch League Score Predictor
 
-Set up a custom bayesian network model (Graphics TBA) for predictions.
+A custom bayesian network model (Graphics TBA) for predictions.
 
-Able to make predictions on past and future matches based on the data parsed from the official overwatch league api (api.overwatchleague.com/).
+Predicts past and future matches based on the data parsed from the official overwatch league api (api.overwatchleague.com/).
 
 
 Currect Prediction Accuracy (OWL 2019 Stage 2): 
