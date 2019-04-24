@@ -1,7 +1,7 @@
 # OverwatchLeagueScorePrediction
 
 
-Make predictions on past and future matches based on the data parsed from overwatch league official api (api.overwatchleague.com/).
+Make predictions on past and future matches based on the data parsed from the official overwatch league api (api.overwatchleague.com/).
 
 Currect Prediction Accuracy (OWL 2019 Stage 2): 
 
