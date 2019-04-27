@@ -77,10 +77,11 @@ class OwlData:
         self.table = content
 
 
-def naive_bayesian(teamData, teamA, teamB):
+def naive_bayesian(teamData, teamA, teamB, flip):
+
+    flipped = flip
 
     # bayesian network settings
-    
     offensePlay = [0.2,0.4,0.5,0.7,0.5,0.6,0.7,0.9] # P(offensePlay | dpsBetter, tankBetter, supportBetter), [FFF,FFT,FTF,FTT,TFF,TFT,TTF,TTT]
     defensePlay = [0.3,0.4,0.6,0.6,0.3,0.5,0.6,0.9] # P(dffensePlay | dpsBetter, tankBetter, supportBetter), [FFF,FFT,FTF,FTT,TFF,TFT,TTF,TTT]
     winOD = [0.85, 0.6, 0.6, 0.3] # P(win | offensePlay, defensePlay), [TT, TF, FT, FF]
@@ -98,22 +99,24 @@ def naive_bayesian(teamData, teamA, teamB):
     dtank = float(teamAData["tankK/D"]) + float(teamAData["tankUlt/10mins"]) - float(teamBData["tankK/D"]) - float(teamBData["tankUlt/10mins"])
     dsupport = float(teamAData["supportHealing"])/2000.0 + float(teamAData["supportUlt/10mins"]) - float(teamBData["supportHealing"])/2000.0 - float(teamBData["supportUlt/10mins"])
 
-    if ddps+dtank+dsupport < 0:
-        return 1-naive_bayesian(teamData, teamB, teamA)
+    if (ddps<0)+(dtank<0)+(dsupport < 0) >= 2:
+        return naive_bayesian(teamData, teamB, teamA, 1)
 
     dpsBetter = 0
     tankBetter = 0
     supportBetter = 0
+    
     if ddps > 1.1:
         dpsBetter = 1
     if dtank > 1.1:
         tankBetter = 1
+    elif dtank < -1.1:
+        tankBetter = -0.5
     if dsupport > 0.5:
         supportBetter = 1
+    elif dsupport < -1:
+        supportBetter = -1
 
-    index = (4*dpsBetter+2*tankBetter+supportBetter)
-    if index == 0:
-        index += 4*(AWinRate[0] > BWinRate[0]) + (AWinRate[1] > BWinRate[1])
 
     '''
     print("!!!!")
@@ -124,15 +127,17 @@ def naive_bayesian(teamData, teamA, teamB):
     print(tankBetter)
     print(supportBetter)
     '''
+    
+    index = (4*dpsBetter+2*tankBetter+supportBetter)
+    if index == 0:
+        index += 4*(AWinRate[0] > BWinRate[0]) + (AWinRate[1] > BWinRate[1])
 
-    # P(w|d,t,s) = \sumGD, sumGO\ P(w, GO,GD, d,t,s)
-    # sumGD, sumGO P(w|GO,GD) * P(GO| d,t,s) * P(GD| d,t,s)
 
     win = winOD[0]*offensePlay[index]*defensePlay[index] + winOD[1]*(1-offensePlay[index])*defensePlay[index] + winOD[2]*offensePlay[index]*(1-defensePlay[index]) + winOD[3]*(1-offensePlay[index])*(1-defensePlay[index])
     lose = (1-winOD[0])*offensePlay[index]*defensePlay[index] + (1-winOD[1])*(1-offensePlay[index])*defensePlay[index] + (1-winOD[2])*offensePlay[index]*(1-defensePlay[index]) + (1-winOD[3])*(1-offensePlay[index])*(1-defensePlay[index])
 
     win /= (win+lose)
-    return win
+    return win, flipped
 
 def collectdata(owl):
     owl.get_playerdata()
@@ -142,25 +147,23 @@ def collectdata(owl):
 
 def predict(owl,A,B):
     owl.read_from_file("OWL.csv")
+    
     try:
-        win = naive_bayesian(owl.table,A,B)
+        win,flp = naive_bayesian(owl.table,A,B,0)
     except Exception:
         print("Invalid Team Name")
         return []
 
     score = ""
-    if(win > 0.65):
+    if win > 0.63:
         score = " 4-0 "
-    elif(win > 0.5):
+    elif win > 0.44:
         score = " 3-1 "
-    elif(win > 0.45):
-        score = " 3-2"
-    elif(win > 0.4):
-        score = " 2-3 "
-    elif(win > 0.35):
-        score = " 1-3 "
     else:
-        score = " 0-4 "
+        score = " 3-2 "
+
+    if flp == 1:
+        score = score[::-1]
     return [A,score,B]
 
 def predictAll(owl):
@@ -171,15 +174,19 @@ def predictAll(owl):
     f = open(filename, "a")
     count = 0.0
     correct = 0.0
+    c = 0.0
     for (A,B,S) in owl.schedule:
+        P = predict(owl,A,B)[1].strip()
         if S != "0-0":
             count += 1
-        P = predict(owl,A,B)[1].strip()
-        if S == P:
-            correct += 1
-        f.write(A+" vs "+B+"        Real Score: "+S+" Predicted Score: "+P+"\n\n")
+            if S == P:
+                correct += 1
+            if P != "0-0" and (S[0] > S[2]) == (P[0] > P[2]):
+                c += 1
+        f.write(A+" vs "+B+"        Real Score: "+S+" Predicted Score: "+P+" \n\n")
     f.close()
-    print(str(correct*100/count)+"% total accuracy")
+    print(str(correct*100/count)+"% total score accuracy")
+    print(str(c*100/count)+"% total win accuracy")
 
 def inputpredict(owl):
     A = raw_input("Team A name/abbr: ").strip()
