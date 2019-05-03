@@ -21,6 +21,8 @@ Usage:
 Sample Output:
    
    Boston Uprising         |   Los Angeles Gladiators     Score: 0-0 Prediction: 1-3 
+   
    Toronto Defiant         |   Vancouver Titans           Score: 0-0 Prediction: 0-4 
+   
    Shanghai Dragons        |   Washington Justice         Score: 0-0 Prediction: 3-1 
 
