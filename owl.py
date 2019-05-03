@@ -1,6 +1,7 @@
 import urllib
 import os, time
 import json, csv, collections
+import argparse
 
 class OwlData:
 
@@ -116,17 +117,6 @@ def naive_bayesian(teamData, teamA, teamB, flip):
         supportBetter = 1
     elif dsupport < -1:
         supportBetter = -1
-
-
-    '''
-    print("!!!!")
-    print(ddps)
-    print(dtank)
-    print(dsupport)
-    print(dpsBetter)
-    print(tankBetter)
-    print(supportBetter)
-    '''
     
     index = (4*dpsBetter+2*tankBetter+supportBetter)
     if index == 0:
@@ -144,10 +134,9 @@ def collectdata(owl):
     owl.get_teamdata()
     owl.to_dict()
     owl.save_to_file("OWL.csv")
+    owl.read_from_file("OWL.csv")
 
 def predict(owl,A,B):
-    owl.read_from_file("OWL.csv")
-    
     try:
         win,flp = naive_bayesian(owl.table,A,B,0)
     except Exception:
@@ -183,24 +172,57 @@ def predictAll(owl):
                 correct += 1
             if P != "0-0" and (S[0] > S[2]) == (P[0] > P[2]):
                 c += 1
-        f.write(A+" vs "+B+"        Real Score: "+S+" Predicted Score: "+P+" \n\n")
+        f.write("{:<22}".format(A)+"  |   "+"{:<22}".format(B)+"     Score: "+S+" Prediction: "+P+" \n\n")
     f.close()
     print(str(correct*100/count)+"% total score accuracy")
     print(str(c*100/count)+"% total win accuracy")
 
-def inputpredict(owl):
-    A = raw_input("Team A name/abbr: ").strip()
-    B = raw_input("Team B name/abbr: ").strip()
-    if A == B:
-        print("Please Enter two different teams")
-        return []
-    return predict(owl,A,B)
+def inputpredict(owl,list):
+    print("\n Enter \\ to show team list \n")
+    while True:
+        A = raw_input("Team A name/abbr: ").strip()
+        if A == "\\":
+            print '\n'.join(list)
+            print "\n"
+            continue
+        B = raw_input("Team B name/abbr: ").strip()
+        if B =="\\":
+            print '\n'.join(list)
+            print "\n"
+            continue
+        if A == B:
+            print("Please Enter two different teams")
+            continue
+        res = predict(owl,A,B)
+        if res :
+            return res
+    return
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--collect', '-c',action='store_true', help="collect new data from OWL api")
+    parser.add_argument('--manual', '-m',action='store_true', help="run a single match prediction with maunal inputs")
+    parser.add_argument('--all', '-a',action='store_true', help="run a batch match predictions with inputs based on match schedule")
+    parser.add_argument('--show', '-s',action='store_true', help="display a list of team names and abbrs")
+    args = parser.parse_args()
+    
+    
     owl = OwlData(2)
-    #collectdata(owl)
-    predictAll(owl)
-    #print(inputpredict(owl))
+    try:
+        owl.read_from_file("OWL.csv")
+    except IOError:
+        collectdata(owl)
+        owl.read_from_file("OWL.csv")
+    list = ["{:<22}".format(d["name"])+"  |  " + "{:<5}".format(d["abbr"]) for d in owl.table]
+
+    if args.show:
+        print '\n'.join(list)
+    if args.collect:
+        collectdata(owl)
+    if args.manual:
+        print inputpredict(owl,list)
+    elif args.all:
+        predictAll(owl)
 
 
 if __name__ == "__main__":
