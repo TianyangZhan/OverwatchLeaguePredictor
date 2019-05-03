@@ -119,12 +119,15 @@ def naive_bayesian(teamData, teamA, teamB, flip):
         supportBetter = -1
     
     index = (4*dpsBetter+2*tankBetter+supportBetter)
-    if index == 0:
+    if index <= 0:
         index += 4*(AWinRate[0] > BWinRate[0]) + (AWinRate[1] > BWinRate[1])
+    index = int(max(0,index))
 
-
-    win = winOD[0]*offensePlay[index]*defensePlay[index] + winOD[1]*(1-offensePlay[index])*defensePlay[index] + winOD[2]*offensePlay[index]*(1-defensePlay[index]) + winOD[3]*(1-offensePlay[index])*(1-defensePlay[index])
-    lose = (1-winOD[0])*offensePlay[index]*defensePlay[index] + (1-winOD[1])*(1-offensePlay[index])*defensePlay[index] + (1-winOD[2])*offensePlay[index]*(1-defensePlay[index]) + (1-winOD[3])*(1-offensePlay[index])*(1-defensePlay[index])
+    try:
+        win = winOD[0]*offensePlay[index]*defensePlay[index] + winOD[1]*(1-offensePlay[index])*defensePlay[index] + winOD[2]*offensePlay[index]*(1-defensePlay[index]) + winOD[3]*(1-offensePlay[index])*(1-defensePlay[index])
+        lose = (1-winOD[0])*offensePlay[index]*defensePlay[index] + (1-winOD[1])*(1-offensePlay[index])*defensePlay[index] + (1-winOD[2])*offensePlay[index]*(1-defensePlay[index]) + (1-winOD[3])*(1-offensePlay[index])*(1-defensePlay[index])
+    except:
+        print index
 
     win /= (win+lose)
     return win, flipped
@@ -139,14 +142,13 @@ def collectdata(owl):
 def predict(owl,A,B):
     try:
         win,flp = naive_bayesian(owl.table,A,B,0)
-    except Exception:
-        print("Invalid Team Name")
-        return []
+    except:
+        print "Error when accessing team data, please check input team names"
 
     score = ""
     if win > 0.63:
         score = " 4-0 "
-    elif win > 0.44:
+    elif win > 0.4:
         score = " 3-1 "
     else:
         score = " 3-2 "
@@ -165,7 +167,9 @@ def predictAll(owl):
     correct = 0.0
     c = 0.0
     for (A,B,S) in owl.schedule:
+
         P = predict(owl,A,B)[1].strip()
+
         if S != "0-0":
             count += 1
             if S == P:
