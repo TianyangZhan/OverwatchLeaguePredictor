@@ -61,7 +61,7 @@ class OwlData:
 
     def get_schedule(self):
         url = urllib.urlopen("https://api.overwatchleague.com/schedule")
-        schedule = json.loads(url.read().decode())
+        schedule = json.loads(url.read())
         self.schedule = [(d["competitors"][0]["name"],d["competitors"][1]["name"],str(d["scores"][0]["value"])+"-"+str(d["scores"][1]["value"])) for d in schedule["data"]["stages"][self.stage]["matches"] if d["competitors"][0] != None ]
 
     def save_to_file(self,fileName):
@@ -85,7 +85,7 @@ def naive_bayesian(teamData, teamA, teamB, flip):
     # bayesian network settings
     offensePlay = [0.2,0.4,0.5,0.7,0.5,0.6,0.7,0.9] # P(offensePlay | dpsBetter, tankBetter, supportBetter), [FFF,FFT,FTF,FTT,TFF,TFT,TTF,TTT]
     defensePlay = [0.3,0.4,0.6,0.6,0.3,0.5,0.6,0.9] # P(dffensePlay | dpsBetter, tankBetter, supportBetter), [FFF,FFT,FTF,FTT,TFF,TFT,TTF,TTT]
-    winOD = [0.85, 0.6, 0.6, 0.3] # P(win | offensePlay, defensePlay), [TT, TF, FT, FF]
+    winOD = [0.8, 0.7, 0.6, 0.35] # P(win | offensePlay, defensePlay), [TT, TF, FT, FF]
 
     # data parsing
     teamAData = [d for d in teamData if d["name"] == teamA or d["abbr"] == teamA][0]
@@ -121,7 +121,7 @@ def naive_bayesian(teamData, teamA, teamB, flip):
     index = (4*dpsBetter+2*tankBetter+supportBetter)
     if index <= 0:
         index += 4*(AWinRate[0] > BWinRate[0]) + (AWinRate[1] > BWinRate[1])
-    index = int(max(0,index))
+    index = int(min(max(0,index),7))
 
     try:
         win = winOD[0]*offensePlay[index]*defensePlay[index] + winOD[1]*(1-offensePlay[index])*defensePlay[index] + winOD[2]*offensePlay[index]*(1-defensePlay[index]) + winOD[3]*(1-offensePlay[index])*(1-defensePlay[index])
@@ -148,7 +148,7 @@ def predict(owl,A,B):
     score = ""
     if win > 0.63:
         score = " 4-0 "
-    elif win > 0.4:
+    elif win > 0.53:
         score = " 3-1 "
     else:
         score = " 3-2 "
@@ -178,8 +178,8 @@ def predictAll(owl):
                 c += 1
         f.write("{:<22}".format(A)+"  |   "+"{:<22}".format(B)+"     Score: "+S+" Prediction: "+P+" \n\n")
     f.close()
-    print(str(correct*100/count)+"% total score accuracy")
-    print(str(c*100/count)+"% total win accuracy")
+    print(str(correct*100/count)+"% total score accuracy, ("+str(int(correct))+" / "+str(int(count))+")")
+    print(str(c*100/count)+"% total win accuracy, ("+str(int(c))+" / "+str(int(count))+")")
 
 def inputpredict(owl,list):
     print("\n Enter \\ to show team list \n")
