@@ -7,8 +7,8 @@ Predicts past and future matches based on the data parsed from the official over
 
 Currect Prediction Accuracy (OWL 2019 Stage 2): 
 
-   - Win/Lose Accuracy - 75% 
-   - Match Score Accuracy - 44.8%
+   - Win/Lose Accuracy - 68% 
+   - Match Score Accuracy - 39.8%
 
 Environment: 
 
