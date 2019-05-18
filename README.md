@@ -18,7 +18,7 @@ Usage:
 
     python owl.py
    
-     Options:
+    Options:
      -c  --collect     Collect new data from OWL api.
      -m  --manual      Run a single match prediction with maunal inputs.
      -a  --all         Batch run match predictions with inputs based on match schedule.
