@@ -18,11 +18,11 @@ Usage:
 
     python owl.py
    
-  Options:
-  -c --collect     Collect new data from OWL api.
-  -m --manual      Run a single match prediction with maunal inputs.
-  -a --all         Batch run match predictions with inputs based on match schedule.
-  -s --show        Display a list of team names and abbrs.
+     Options:
+     -c  --collect     Collect new data from OWL api.
+     -m  --manual      Run a single match prediction with maunal inputs.
+     -a  --all         Batch run match predictions with inputs based on match schedule.
+     -s  --show        Display a list of team names and abbrs.
 
 
 Sample Output:
