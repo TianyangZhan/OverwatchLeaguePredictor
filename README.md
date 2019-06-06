@@ -5,10 +5,10 @@ A custom bayesian network model for predictions.
 Predicts past and future matches based on the data parsed from the official overwatch league api (api.overwatchleague.com/).
 
 
-Currect Prediction Accuracy (OWL 2019 Stage 2): 
+Prediction Accuracy on OWL 2019 Stage 2 Games: 
 
-   - Win/Lose Accuracy - 68% 
-   - Match Score Accuracy - 39.8%
+   - Average Win/Lose Accuracy - 74% 
+   - Average Match Score Accuracy - 42%
 
 Environment: 
 
@@ -16,12 +16,12 @@ Environment:
 
 Usage: 
 
-    python owl.py
+    python predict.py
    
     Options:
      -c  --collect     Collect new data from OWL api.
      -m  --manual      Run a single match prediction with maunal inputs.
-     -a  --all         Batch run match predictions with inputs based on match schedule.
+     -n  --new         Batch run match predictions on a future week's schedule.
      -s  --show        Display a list of team names and abbrs.
 
 
