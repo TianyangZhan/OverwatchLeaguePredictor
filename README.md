@@ -7,8 +7,8 @@ Predicts past and future matches based on the data parsed from the official over
 
 Currect Prediction Accuracy (OWL 2019 Stage 2): 
 
-   - Win/Lose Accuracy - 75% 
-   - Match Score Accuracy - 44.8%
+   - Win/Lose Accuracy - 68% 
+   - Match Score Accuracy - 39.8%
 
 Environment: 
 
@@ -17,6 +17,13 @@ Environment:
 Usage: 
 
     python owl.py
+   
+    Options:
+     -c  --collect     Collect new data from OWL api.
+     -m  --manual      Run a single match prediction with maunal inputs.
+     -a  --all         Batch run match predictions with inputs based on match schedule.
+     -s  --show        Display a list of team names and abbrs.
+
 
 Sample Output:
    
