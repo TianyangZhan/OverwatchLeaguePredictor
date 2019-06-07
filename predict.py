@@ -40,7 +40,7 @@ def naive_bayesian(teamData, teamA, teamB, flip):
         tankBetter = 1
     elif dtank < -1.1:
         tankBetter = -0.5
-    if dsupport > 0.5:
+    if dsupport > 0.75:
         supportBetter = 1
     elif dsupport < -1:
         supportBetter = -1
@@ -86,26 +86,38 @@ def predict(owl,A,B):
 
 def predictAll(owl):
     owl.get_schedule()
-    filename = "./results/"+owl.stage+"_"+owl.week+"_"+time.strftime("%Y%m%d")+".txt"
+    filename = "./results/"+owl.stage+"_"+owl.week+".txt"
     if not os.path.exists(os.path.dirname(filename)):
         os.makedirs(os.path.dirname(filename))
-    f = open(filename, "a")
-    count = 0.0
-    correct = 0.0
-    c = 0.0
-    
-    for (A,B,S) in owl.schedule:
 
-        P = predict(owl,A,B)[1].strip()
+    ff = open(filename, "r")
+    lines = ff.readlines()
+    ff.close()
+    lines = [l for l in lines if l != "\n"]
 
-        if S != "0-0":
-            count += 1
-            if S == P:
-                correct += 1
-            if P != "0-0" and (S[0] > S[2]) == (P[0] > P[2]):
-                c += 1
-        f.write("{:<22}".format(A)+"  |   "+"{:<22}".format(B)+"     Score: "+S+" Prediction: "+P+" \n\n")
-    f.close()
+    with open(filename, "w") as f:
+        count = 0.0
+        correct = 0.0
+        c = 0.0
+
+        content = "\n"
+        i = -1
+        for (A,B,S) in owl.schedule:
+            i += 1
+            if len(lines) > 0 and lines[i].split(" ")[-4] != "0-0":
+                content += lines[i] + "\n"
+                continue
+            P = predict(owl,A,B)[1].strip()
+
+            if S != "0-0":
+                count += 1
+                if S == P:
+                    correct += 1
+                if P != "0-0" and (S[0] > S[2]) == (P[0] > P[2]):
+                    c += 1
+            content += "{:<22}".format(A)+"  |   "+"{:<22}".format(B)+"     Score: "+S+" Prediction: "+P+" \n\n"
+        f.write(content)
+        print(content)
 
     if count != 0:
         print(str(correct*100/count)+"% total score accuracy, ("+str(int(correct))+" / "+str(int(count))+")")
