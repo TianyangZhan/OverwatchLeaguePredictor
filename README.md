@@ -23,11 +23,17 @@ Usage:
      -m  --manual      Run a single match prediction with maunal inputs.
      -n  --new         Batch run match predictions on a future week's schedule.
      -s  --show        Display a list of team names and abbrs.
+     -i  --image       Enable image output.
 
 
 Sample Output:
    
-   Boston Uprising         |   Los Angeles Gladiators  |  Score: 0-0  |  Prediction: 1-3 
+   * Text:
+   
+      <img src="https://github.com/TianyangZhan/OverwatchLeaguePredictor/blob/master/TextOutput.jpg" width="320">
+   * Image:
+   
+      <img src="https://github.com/TianyangZhan/OverwatchLeaguePredictor/blob/master/image_results/Stage3_Week1.jpg" width="200">
    
 
 Bayesian Network Model:
