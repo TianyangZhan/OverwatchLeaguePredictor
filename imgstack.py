@@ -47,8 +47,8 @@ def horizontal_img(A,B,S,P):
 
 def header_gen():
     A = write_txt("Team 1",(250, 100),(0,0,0),"Arial.ttf",50,(255,255,255))
-    S = write_txt("Score",(135, 50),(0,0,0),"Arial.ttf",25,(255,255,255))
-    P = write_txt("Prediction",(135, 50),(0,0,0),"Arial.ttf",25,(255,255,255))
+    S = write_txt("Score",(140, 50),(0,0,0),"Arial.ttf",25,(255,255,255))
+    P = write_txt("Prediction",(140, 50),(0,0,0),"Arial.ttf",25,(255,255,255))
     B = write_txt("Team 2",(250, 100),(0,0,0),"Arial.ttf",50,(255,255,255))
 
     SP = v_stack([S,Image.new("RGB", (300, 5), (255,255,255)),P])
