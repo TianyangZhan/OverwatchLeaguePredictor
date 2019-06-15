@@ -3,6 +3,7 @@ import os, time
 import json, csv, collections
 import argparse
 from owl import OwlData
+from imgstack import horizontal_img, vertical_img, save_img
 
 
 def naive_bayesian(teamData, teamA, teamB, flip):
@@ -84,16 +85,22 @@ def predict(owl,A,B):
         score = score[::-1]
     return [A,score,B]
 
-def predictAll(owl):
-    owl.get_schedule()
+def predictAll(owl,stg=-1,wk=-1,img_flg=False):
+    owl.get_schedule(stg,wk)
     filename = "./results/"+owl.stage+"_"+owl.week+".txt"
     if not os.path.exists(os.path.dirname(filename)):
         os.makedirs(os.path.dirname(filename))
 
-    ff = open(filename, "r")
-    lines = ff.readlines()
-    ff.close()
-    lines = [l for l in lines if l != "\n"]
+    lines = []
+    try:
+        ff = open(filename, "r")
+        lines = ff.readlines()
+        ff.close()
+        lines = [l for l in lines if l != "\n"]
+    except:
+        pass
+    lst = ["4-0","0-4","1-3","3-1","2-3","3-2"]
+    imglst = []
 
     with open(filename, "w") as f:
         count = 0.0
@@ -102,26 +109,47 @@ def predictAll(owl):
 
         content = "\n"
         i = -1
+        
         for (A,B,S) in owl.schedule:
-            i += 1
-            if len(lines) > 0 and lines[i].split(" ")[-4] != "0-0":
-                content += lines[i] + "\n"
-                continue
-            P = predict(owl,A,B)[1].strip()
 
+            i += 1
+            
+            if len(lines) > 0 and lines[i].split(" ")[-4] in lst:
+                content += lines[i] + "\n"
+                count += 1
+                if lines[i].split(" ")[-4] == lines[i].split(" ")[-2]:
+                    correct += 1
+                if lines[i].split(" ")[-2] in lst and (lines[i].split(" ")[-4][0] > lines[i].split(" ")[-4][2]) == (lines[i].split(" ")[-2][0] > lines[i].split(" ")[-2][2]):
+                    c += 1
+                P = lines[i].split(" ")[-2]
+                
+                if img_flg:
+                    imglst.append(horizontal_img(A,B,S,P))
+                
+                continue
+                    
+            P = predict(owl,A,B)[1].strip()
+            
+            if img_flg:
+                imglst.append(horizontal_img(A,B,S,P))
+            
             if S != "0-0":
                 count += 1
                 if S == P:
                     correct += 1
-                if P != "0-0" and (S[0] > S[2]) == (P[0] > P[2]):
+                if (S[0] > S[2]) == (P[0] > P[2]):
                     c += 1
             content += "{:<22}".format(A)+"  |   "+"{:<22}".format(B)+"     Score: "+S+" Prediction: "+P+" \n\n"
         f.write(content)
         print(content)
 
+    if img_flg:
+        im = vertical_img(imglst,owl.stage+" "+owl.week)
+        save_img(im, "./image_results/"+owl.stage+"_"+owl.week+".jpg")
+
     if count != 0:
-        print(str(correct*100/count)+"% total score accuracy, ("+str(int(correct))+" / "+str(int(count))+")")
-        print(str(c*100/count)+"% total win accuracy, ("+str(int(c))+" / "+str(int(count))+")")
+        print(str(correct*100/count)+"% score accuracy, ("+str(int(correct))+" / "+str(int(count))+")")
+        print(str(c*100/count)+"% win/lose accuracy, ("+str(int(c))+" / "+str(int(count))+")\n")
 
 def inputpredict(owl,list):
     print("\n Enter \\ to show team list \n")
@@ -144,14 +172,67 @@ def inputpredict(owl,list):
             return res
     return
 
+def eval(owl):
+
+    count = 0.0
+    correct = 0.0
+    c = 0.0
+    lst = ["4-0","0-4","1-3","3-1","2-3","3-2"]
+    
+    outputdir = "./results/"
+    files = [f for f in os.listdir(outputdir) if os.path.isfile(os.path.join(outputdir, f)) and f[-4:] == '.txt']
+    
+    for file in files:
+        flag = False
+        scores = []
+        try:
+            scores = owl.check_schedule(int(file[5]),int(file[-5])-1)
+        except:
+            flag = True
+        filename = outputdir+file
+        try:
+            ff = open(filename, "r")
+            lines = ff.readlines()
+            ff.close()
+            lines = [l for l in lines if l != "\n"]
+        except:
+            pass
+        
+        i = -1
+        content = "\n"
+        for line in lines:
+            i += 1
+            l = line.split(" ")
+            if not flag:
+                l[-4] = scores[i]
+            content += " ".join(l) + "\n"
+            
+            S = l[-4]
+            P = l[-2]
+            if S != "0-0":
+                count += 1
+                if S == P:
+                    correct += 1
+                if (S[0] > S[2]) == (P[0] > P[2]):
+                    c += 1
+        with open(filename, "w") as newf:
+            newf.write(content)
+
+    if count != 0:
+        print("Overall score accuracy: "+str(correct*100/count)+"%, ("+str(int(correct))+" / "+str(int(count))+")")
+        print("Overall win/lose accuracy: "+str(c*100/count)+"%, ("+str(int(c))+" / "+str(int(count))+")\n")
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--collect', '-c',action='store_true', help="collect new data from OWL api")
     parser.add_argument('--manual', '-m',action='store_true', help="run a single match prediction with maunal inputs")
     parser.add_argument('--new', '-n',action='store_true', help="run a batch match predictions on a future week's schedule")
-    parser.add_argument('--show', '-s',action='store_true', help="display a list of team names and abbrs")
+    parser.add_argument('--stage','-s', type=int, help="specify stage", default=0, required=False)
+    parser.add_argument('--week','-w', type=int, help="specify week", default=0, required=False)
+    parser.add_argument('--list', '-l',action='store_true', help="display a list of team names and abbrs")
+    parser.add_argument('--eval', '-e',action='store_true', help="evaluate output results")
+    parser.add_argument('--image', '-i',action='store_true', help="generate image outputs")
     args = parser.parse_args()
-    
     
     owl = OwlData()
     try:
@@ -161,14 +242,24 @@ def main():
         owl.read_from_file("OWL.csv")
     list = ["{:<22}".format(d["name"])+"  |  " + "{:<5}".format(d["abbr"]) for d in owl.table]
 
-    if args.show:
+    img_flg = False
+    if args.image:
+        img_flg = True
+    if args.list:
         print '\n'.join(list)
     if args.collect:
         collectdata(owl)
     if args.manual:
         print inputpredict(owl,list)
     elif args.new:
-        predictAll(owl)
+        if args.stage >= 4:
+            args.stage == 5
+        elif args.stage == 3:
+            args.stage += 1
+        predictAll(owl,args.stage-1,args.week-1,img_flg)
+
+    if args.eval:
+        eval(owl)
 
 
 if __name__ == "__main__":

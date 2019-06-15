@@ -64,29 +64,36 @@ class OwlData:
         self.playerdata = hashmap
 
 
-    def get_schedule(self):
+    def get_schedule(self,curr_stage = -1, curr_week = -1):
+
         url = urllib.urlopen("https://api.overwatchleague.com/schedule")
         schedule = json.loads(url.read())
         
-        curr_stage = len(schedule["data"]["stages"])-1
-        while curr_stage >= 0:
-            if len(schedule["data"]["stages"][curr_stage]["matches"]) > 0 and schedule["data"]["stages"][curr_stage]["matches"][-1]["state"] != "CONCLUDED":
-                if curr_stage <= 0 or schedule["data"]["stages"][curr_stage-1]["matches"][-1]["state"] == "CONCLUDED":
-                    break
-            curr_stage -= 1
+        if curr_stage == -1:
+            curr_stage = len(schedule["data"]["stages"])-1
+            while curr_stage >= 0:
+                if len(schedule["data"]["stages"][curr_stage]["matches"]) > 0 and schedule["data"]["stages"][curr_stage]["matches"][-1]["state"] != "CONCLUDED":
+                    if curr_stage <= 0 or schedule["data"]["stages"][curr_stage-1]["matches"][-1]["state"] == "CONCLUDED":
+                        break
+                curr_stage -= 1
 
-        curr_week = len(schedule["data"]["stages"][curr_stage]["weeks"])-1
-        while curr_week >= 0:
-            if len(schedule["data"]["stages"][curr_stage]["weeks"][curr_week]["matches"]) > 0 and schedule["data"]["stages"][curr_stage]["weeks"][curr_week]["matches"][-1]["state"] != "CONCLUDED":
-                if curr_week <= 0 or schedule["data"]["stages"][curr_stage]["weeks"][curr_week-1]["matches"][-1]["state"] == "CONCLUDED":
-                    break
-            curr_week -= 1
+        if curr_week == -1:
+            curr_week = len(schedule["data"]["stages"][curr_stage]["weeks"])-1
+            while curr_week >= 0:
+                if len(schedule["data"]["stages"][curr_stage]["weeks"][curr_week]["matches"]) > 0 and schedule["data"]["stages"][curr_stage]["weeks"][curr_week]["matches"][-1]["state"] != "CONCLUDED":
+                    if curr_week <= 0 or schedule["data"]["stages"][curr_stage]["weeks"][curr_week-1]["matches"][-1]["state"] == "CONCLUDED":
+                        break
+                curr_week -= 1
 
-        self.stage = schedule["data"]["stages"][curr_stage]["name"]
-        self.week = schedule["data"]["stages"][curr_stage]["weeks"][curr_week]["name"]
+        self.stage = schedule["data"]["stages"][curr_stage]["name"].replace(" ","")
+        self.week = schedule["data"]["stages"][curr_stage]["weeks"][curr_week]["name"].replace(" ","")
+        self.schedule = [(d["competitors"][0]["name"],d["competitors"][1]["name"],str(d["scores"][0]["value"])+"-"+str(d["scores"][1]["value"])) for d in schedule["data"]["stages"][curr_stage]["weeks"][curr_week]["matches"] if d["competitors"][0]]
 
-        self.schedule = [(d["competitors"][0]["name"],d["competitors"][1]["name"],str(d["scores"][0]["value"])+"-"+str(d["scores"][1]["value"])) for d in schedule["data"]["stages"][curr_stage]["weeks"][curr_week]["matches"] if d["state"] != "CONCLUDED"]
-
+    def check_schedule(self,stg,wk):
+        url = urllib.urlopen("https://api.overwatchleague.com/schedule")
+        schedule = json.loads(url.read())
+    
+        return [str(d["scores"][0]["value"])+"-"+str(d["scores"][1]["value"]) for d in schedule["data"]["stages"][stg]["weeks"][wk]["matches"] if d["competitors"][0]]
 
     def save_to_file(self,fileName):
         colname = self.table[0].keys()
