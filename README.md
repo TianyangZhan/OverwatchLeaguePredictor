@@ -16,7 +16,7 @@ Predicts past and future matches based on the data parsed from the official over
     Python: Python 2.x
     Packages: Numpy, Pillow
     
-    pip -install -r requirements.txt
+    pip install -r requirements.txt
 
 
 **Usage:** 
