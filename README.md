@@ -30,7 +30,7 @@ Sample Output:
    Boston Uprising         |   Los Angeles Gladiators  |  Score: 0-0  |  Prediction: 1-3 
    
 
-Model:
+Bayesian Network Model:
    
-  (Graph N/A) 
+![Alt text](https://github.com/TianyangZhan/OverwatchLeaguePredictor/blob/master/Model.jpg?raw=true "Title")
 
