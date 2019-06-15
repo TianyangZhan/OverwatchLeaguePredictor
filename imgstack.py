@@ -50,8 +50,9 @@ def vertical_img(imgs, title = ""):
     result[0::2] = imgs
     return Image.fromarray(np.vstack(result))
 
-def save_img(im,name):
-    im.show()
+def save_img(im,name,disp=False):
+    if disp:
+        im.show()
     im.save(name)
 
 def main():

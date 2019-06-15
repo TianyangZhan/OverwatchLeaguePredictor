@@ -145,7 +145,7 @@ def predictAll(owl,stg=-1,wk=-1,img_flg=False):
 
     if img_flg:
         im = vertical_img(imglst,owl.stage+" "+owl.week)
-        save_img(im, "./image_results/"+owl.stage+"_"+owl.week+".jpg")
+        save_img(im, "./image_results/"+owl.stage+"_"+owl.week+".jpg",True)
 
     if count != 0:
         print(str(correct*100/count)+"% score accuracy, ("+str(int(correct))+" / "+str(int(count))+")")
@@ -172,7 +172,7 @@ def inputpredict(owl,list):
             return res
     return
 
-def eval(owl):
+def eval(owl,img_flg=False):
 
     count = 0.0
     correct = 0.0
@@ -200,6 +200,7 @@ def eval(owl):
         
         i = -1
         content = "\n"
+        imglst = []
         for line in lines:
             i += 1
             l = line.split(" ")
@@ -207,8 +208,27 @@ def eval(owl):
                 l[-4] = scores[i]
             content += " ".join(l) + "\n"
             
+
+            A = ""
+            B = ""
+            bname = False
+            for item in l:
+                if item == 'Score:':
+                    break
+                if item == '|':
+                    bname = True
+                    continue
+                if not bname:
+                    A += item
+                else:
+                    B += item
+
             S = l[-4]
             P = l[-2]
+            
+            if img_flg:
+                imglst.append(horizontal_img(A,B,S,P))
+            
             if S != "0-0":
                 count += 1
                 if S == P:
@@ -217,6 +237,10 @@ def eval(owl):
                     c += 1
         with open(filename, "w") as newf:
             newf.write(content)
+        
+        if img_flg:
+            im = vertical_img(imglst,file[:6]+" "+file[-9:-4])
+            save_img(im, "./image_results/"+file[:6]+"_"+file[-9:-4]+".jpg")
 
     if count != 0:
         print("Overall score accuracy: "+str(correct*100/count)+"%, ("+str(int(correct))+" / "+str(int(count))+")")
@@ -231,7 +255,7 @@ def main():
     parser.add_argument('--week','-w', type=int, help="specify week", default=0, required=False)
     parser.add_argument('--list', '-l',action='store_true', help="display a list of team names and abbrs")
     parser.add_argument('--eval', '-e',action='store_true', help="evaluate output results")
-    parser.add_argument('--image', '-i',action='store_true', help="generate image outputs")
+    parser.add_argument('--image', '-i',action='store_true', help="enable image output")
     args = parser.parse_args()
     
     owl = OwlData()
@@ -259,7 +283,7 @@ def main():
         predictAll(owl,args.stage-1,args.week-1,img_flg)
 
     if args.eval:
-        eval(owl)
+        eval(owl,img_flg)
 
 
 if __name__ == "__main__":
