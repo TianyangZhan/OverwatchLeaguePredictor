@@ -38,7 +38,7 @@ Sample Output:
       <img src="https://github.com/TianyangZhan/OverwatchLeaguePredictor/blob/master/TextOutput.jpg" width="320">
    * Image:
    
-      <img src="https://github.com/TianyangZhan/OverwatchLeaguePredictor/blob/master/image_results/Stage3_Week1.jpg" width="200">
+      <img src="https://github.com/TianyangZhan/OverwatchLeaguePredictor/blob/master/image_results/Stage3_Week1.jpg" width="320">
    
 
 Bayesian Network Model:
