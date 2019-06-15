@@ -20,9 +20,13 @@ Usage:
    
     Options:
      -c  --collect     Collect new data from OWL api
+     -l  --list        Display a list of team names and abbrs
+     
      -m  --manual      Run a single match prediction with maunal inputs
      -n  --new         Batch run match predictions on a future week's schedule
-     -s  --show        Display a list of team names and abbrs
+     -s  --stage       Specify Stage
+     -w  --week        Specify Week
+     
      -e  --eval        Evaluate output results
      -i  --image       Enable image output
 
