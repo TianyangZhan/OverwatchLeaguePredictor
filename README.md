@@ -19,11 +19,12 @@ Usage:
     python predict.py
    
     Options:
-     -c  --collect     Collect new data from OWL api.
-     -m  --manual      Run a single match prediction with maunal inputs.
-     -n  --new         Batch run match predictions on a future week's schedule.
-     -s  --show        Display a list of team names and abbrs.
-     -i  --image       Enable image output.
+     -c  --collect     Collect new data from OWL api
+     -m  --manual      Run a single match prediction with maunal inputs
+     -n  --new         Batch run match predictions on a future week's schedule
+     -s  --show        Display a list of team names and abbrs
+     -e  --eval        Evaluate output results
+     -i  --image       Enable image output
 
 
 Sample Output:
