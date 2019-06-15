@@ -24,6 +24,7 @@ Predicts past and future matches based on the data parsed from the official over
     python predict.py
    
     Options:
+    
      -c  --collect     Collect new data from OWL api
      -l  --list        Display a list of team names and abbrs
      
