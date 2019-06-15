@@ -144,7 +144,7 @@ def predictAll(owl,stg=-1,wk=-1,img_flg=False):
         print(content)
 
     if img_flg:
-        im = vertical_img(imglst,owl.stage+" "+owl.week)
+        im = vertical_img(imglst[:len(imglst)//2],imglst[len(imglst)//2:],owl.stage+" "+owl.week)
         save_img(im, "./image_results/"+owl.stage+"_"+owl.week+".jpg",True)
 
     if count != 0:
@@ -239,7 +239,7 @@ def eval(owl,img_flg=False):
             newf.write(content)
         
         if img_flg:
-            im = vertical_img(imglst,file[:6]+" "+file[-9:-4])
+            im = vertical_img(imglst[:len(imglst)//2],imglst[len(imglst)//2:],file[:6]+" "+file[-9:-4])
             save_img(im, "./image_results/"+file[:6]+"_"+file[-9:-4]+".jpg")
 
     if count != 0:
