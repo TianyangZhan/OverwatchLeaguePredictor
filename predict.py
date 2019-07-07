@@ -60,12 +60,12 @@ def naive_bayesian(teamData, teamA, teamB, flip):
     win /= (win+lose)
     return win, flipped
 
-def collectdata(owl):
+def collectdata(owl,file):
     owl.get_playerdata()
     owl.get_teamdata()
     owl.to_dict()
-    owl.save_to_file("OWL.csv")
-    owl.read_from_file("OWL.csv")
+    owl.save_to_file(file)
+    owl.read_from_file(file)
 
 def predict(owl,A,B):
     try:
@@ -258,11 +258,12 @@ def main():
     args = parser.parse_args()
     
     owl = OwlData()
+    file = "OWL.csv"
     try:
-        owl.read_from_file("OWL.csv")
+        owl.read_from_file(file)
     except IOError:
-        collectdata(owl)
-        owl.read_from_file("OWL.csv")
+        collectdata(owl,file)
+        owl.read_from_file(file)
     list = ["{:<22}".format(d["name"])+"  |  " + "{:<5}".format(d["abbr"]) for d in owl.table]
 
     img_flg = False
@@ -271,7 +272,7 @@ def main():
     if args.list:
         print '\n'.join(list)
     if args.collect:
-        collectdata(owl)
+        collectdata(owl,file)
     if args.manual:
         print inputpredict(owl,list)
     elif args.new:
