@@ -74,7 +74,7 @@ def predict(owl,A,B):
         print "Error when accessing team data, please check input team names"
 
     score = ""
-    if win > 0.63:
+    if win > 0.65:
         score = " 4-0 "
     elif win > 0.53:
         score = " 3-1 "
@@ -99,7 +99,7 @@ def predictAll(owl,stg=-1,wk=-1,img_flg=False):
         lines = [l for l in lines if l != "\n"]
     except:
         pass
-    lst = ["4-0","0-4","1-3","3-1","2-3","3-2"]
+    lst = ["4-0","0-4","1-3","3-1","2-3","3-2","3-0","0-3","2-1","1-2"]
     imglst = []
 
     with open(filename, "w") as f:
@@ -133,7 +133,7 @@ def predictAll(owl,stg=-1,wk=-1,img_flg=False):
             if img_flg:
                 imglst.append(horizontal_img(A,B,S,P))
             
-            if S != "0-0":
+            if S in lst:
                 count += 1
                 if S == P:
                     correct += 1
@@ -177,7 +177,6 @@ def eval(owl,img_flg=False):
     count = 0.0
     correct = 0.0
     c = 0.0
-    lst = ["4-0","0-4","1-3","3-1","2-3","3-2"]
     
     outputdir = "./results/"
     files = [f for f in os.listdir(outputdir) if os.path.isfile(os.path.join(outputdir, f)) and f[-4:] == '.txt']
